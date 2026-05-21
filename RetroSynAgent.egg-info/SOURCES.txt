@@ -4,6 +4,7 @@ RetroSynAgent/GPTAPI.py
 RetroSynAgent/__init__.py
 RetroSynAgent/entityAlignment.py
 RetroSynAgent/knowledgeGraph.py
+RetroSynAgent/llm_client.py
 RetroSynAgent/pdfDownloader.py
 RetroSynAgent/pdfProcessor.py
 RetroSynAgent/prompts.py

@@ -6,7 +6,7 @@ from tqdm import tqdm
 import difflib
 import glob
 from . import prompts
-from .GPTAPI import GPTAPI
+from . import llm_client
 import base64
 from io import BytesIO
 from PIL import Image
@@ -146,9 +146,8 @@ class PDFProcessor:
                 continue
             # Extract the reaction first, then extract the property based on the reaction
             # extract reaction
-            llm = GPTAPI()
             prompt = prompts.prompt_reaction_extraction
-            answer_reaction = llm.answer_w_vision_img_list_txt(prompt, base64_img_list, cleaned_text)
+            answer_reaction = llm_client.complete(prompt, cleaned_text)
             # answer_reaction = llm.answer_wo_vision(prompt, cleaned_text)
             # extract property
             # prompt2 = prompts.property_prompt.format(reactions=answer_reaction)
@@ -197,10 +196,8 @@ class PDFProcessor:
             if total_length > 200000:
                 print(f'{pdf_name} Exceed maximum length, skip ...')
                 continue
-            llm = GPTAPI(temperature = 0.0)
-            # prompt = prompts.reaction_prompt
-            prompt_reaction_extract = prompts.prompt_reaction_extraction_cot # .format(substance=self.material)
-            ans_reaction = llm.answer_wo_vision(prompt_reaction_extract, cleaned_text)
+            prompt_reaction_extract = prompts.prompt_reaction_extraction_cot
+            ans_reaction = llm_client.complete(prompt_reaction_extract, cleaned_text)
             ans_reaction = self.replace_zeros_in_reactants_and_products(ans_reaction)
             # prompt2 = prompts.property_prompt.format(reactions=answer_reaction)
             # answer_property = llm.answer_wo_vision(prompt2, cleaned_text)

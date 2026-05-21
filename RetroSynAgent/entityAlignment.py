@@ -1,5 +1,5 @@
 from . import prompts
-from .GPTAPI import GPTAPI
+from . import llm_client
 import json
 import os
 from tqdm import tqdm
@@ -22,8 +22,7 @@ class EntityAlignment:
             results_dict_modified = results_dict.copy()
             for key, reactions_txt in tqdm(results_dict_modified.items()):
                 prompt = prompts.prompt_align_root_node.format(substance=material, reactions=reactions_txt)
-                llm = GPTAPI()
-                reactions_txt_modified = llm.answer_wo_vision(prompt).replace("′","'")
+                reactions_txt_modified = llm_client.complete(prompt).replace("′", "'")
                 results_dict_modified[key] = reactions_txt_modified
                 # print(f'\n=== origin txt:{reactions_txt}\n=== modified txt:\n{reactions_txt_modified}')
         else:
@@ -37,8 +36,7 @@ class EntityAlignment:
                     for key, reactions_txt in tqdm(results_dict.items()):
                         if not key in results_dict_modified:
                             prompt = prompts.prompt_align_root_node.format(substance=material, reactions=reactions_txt)
-                            llm = GPTAPI()
-                            reactions_txt_modified = llm.answer_wo_vision(prompt).replace("′", "'")
+                            reactions_txt_modified = llm_client.complete(prompt).replace("′", "'")
                             results_dict_modified[key] = reactions_txt_modified
                             # print(f'\n=== origin txt:{reactions_txt}\n=== modified txt:\n{reactions_txt_modified}')
                         # else:
@@ -66,9 +64,8 @@ class EntityAlignment:
         all_substances = list(all_substances)
         # print(f'total num of Mols: {len(all_substances)}')
         #
-        llm = GPTAPI(temperature=0.0)
         prompt_naming = prompts.prompt_template_entity_alignment.format(substances=all_substances)
-        align_result = llm.answer_wo_vision(prompt_naming)
+        align_result = llm_client.complete(prompt_naming)
         #
         filename = "naming_alg_llm_res.json"
         if not os.path.exists(filename):
